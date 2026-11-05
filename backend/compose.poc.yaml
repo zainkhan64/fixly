@@ -1,0 +1,17 @@
+# Combine with Jordan's poc/docker-compose.yml; run commands in README.md.
+# Compose resolves build paths relative to the FIRST compose file (poc/).
+services:
+  backend:
+    build: ../backend
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: ${MYSQL_DATABASE:-fixly}
+      DB_USER: ${MYSQL_USER:?set MYSQL_USER in poc/.env}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in poc/.env}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081}
+    depends_on:
+      db:
+        condition: service_healthy
