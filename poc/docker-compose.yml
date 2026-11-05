@@ -1,0 +1,29 @@
+# Fixly POC: local MySQL for the walking skeleton.
+# The FastAPI backend will be added as a second service in the next step.
+services:
+  db:
+    image: mysql:9.7
+    container_name: fixly-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fixly}
+      MYSQL_USER: ${MYSQL_USER:?set MYSQL_USER in .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      # Database files persist here between restarts.
+      - fixly_mysql_data:/var/lib/mysql
+      # Scripts in this folder run once, when the data volume is first created.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # $$ passes the variable through to the container instead of Compose.
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  fixly_mysql_data:
