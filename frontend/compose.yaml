@@ -1,0 +1,12 @@
+services:
+  fixly-demo:
+    build:
+      context: .
+    ports:
+      - "8081:8081"
+    environment:
+      EXPO_NO_TELEMETRY: "1"
+    init: true
+    volumes:
+      - .:/app
+      - /app/node_modules

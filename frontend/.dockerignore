@@ -1,0 +1,10 @@
+node_modules
+.expo
+.git
+.gitignore
+.env*
+web-build
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
