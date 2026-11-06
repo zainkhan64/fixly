@@ -1,11 +1,39 @@
 import { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
+const apiBaseUrl =
+  process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
+
 export default function App() {
   const [message, setMessage] = useState('Press the button to test the app.');
+  const [loading, setLoading] = useState(false);
 
-  function handlePress() {
-    setMessage('Hello from Fixly! The button works.');
+  async function handlePress() {
+    setLoading(true);
+    setMessage('Loading...');
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/api/message`
+      );
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMessage(data.message);
+  
+    } catch (error) {
+      setMessage(
+        error instanceof Error 
+        ? error.message 
+        : 'Could not connect to backend'
+      );
+    } finally {
+      setLoading(false);
+    }
+
   }
 
   return (
@@ -17,7 +45,7 @@ export default function App() {
       <Text style={styles.message}>{message}</Text>
 
       <Button
-        title="Test Fixly"
+        title={loading ? 'Loading...' : 'Test Fixly'}
         onPress={handlePress}
         color="#087F8C"
       />
